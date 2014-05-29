@@ -14,28 +14,38 @@ switch ($endPoint) {
         nei::doList();
         break;
     case "create":
-        
+        nei::add();
         break;
     case "search":
-        
+        $name = trim($_REQUEST['searchString']);
+        nei::search($name);
         break;
     case "detail":
-        
+        nei::detail(trim($_REQUEST['neighborhood_id']));
         break;
     case "share":
-        
+
         break;
     case "block":
-        
+        $neiID = trim($_REQUEST['neiId']);
+        $userID = trim($_REQUEST['userId']);
+        nei::blocked($neiID, $userID);
         break;
     case "incomingInvite":
-        
+        $userID = trim($_REQUEST['userId']);
+        nei::IncomingInvite($userID);
+        break;
+    case "inviteStatus":
+        $invite_id = trim($_REQUEST['invite_id']);
+        $Accept = trim($_REQUEST['Accept']);
+        nei::InvitationAccept($invite_id, $Accept);
         break;
     case "delete":
-        
+        $neiID = trim($_REQUEST['neiId']);
+        nei::delete($neiID);
         break;
     case "stream":
-        
+
         break;
     default:
         json_die('404', 'Page Not Found');

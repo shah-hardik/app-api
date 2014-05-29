@@ -44,6 +44,9 @@ class user {
         if (self::userExists($data['username'])) {
             json_die('502', 'Username already exists');
         }
+        if (self::emailExists($data['email'])) {
+            json_die('502', 'Email address already exists');
+        }
 
         # finally insert user into database
         $data['password'] = md5($data['password']);
@@ -63,6 +66,17 @@ class user {
     public static function userExists($userName) {
         $userName = _escape($userName);
         $userData = q("select id from user where username = '{$userName}'  ");
+        return count($userData) > 0 ? true : false;
+    }
+
+    /**
+     * 
+     * @param String $EmailAddress
+     * @return booolean
+     */
+    public static function emailExists($EmailAddress) {
+        $EmailAddress = _escape($EmailAddress);
+        $userData = q("select id from user where email = '{$EmailAddress}'  ");
         return count($userData) > 0 ? true : false;
     }
 
