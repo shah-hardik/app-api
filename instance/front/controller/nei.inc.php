@@ -11,7 +11,7 @@
  */
 switch ($endPoint) {
     case "list":
-        
+        nei::doList();
         break;
     case "create":
         

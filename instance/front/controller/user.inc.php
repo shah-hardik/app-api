@@ -9,12 +9,13 @@
  * @since May 2014
  * 
  */
+
 switch ($endPoint) {
     case "signup":
         user::signup();
         break;
     case "login":
-        user::login();
+        user::login($_REQUEST['username'],$_REQUEST['password']);
         break;
     case "profilePicture":
         user::profilePicture();

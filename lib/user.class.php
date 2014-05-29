@@ -49,7 +49,7 @@ class user {
         $data['password'] = md5($data['password']);
         try {
             $userId = qi('user', $data);
-            json_die("200",  "User signed up successfully",array('userId' => $userId));
+            json_die("200", "User signed up successfully", array('userId' => $userId));
         } catch (Exception $e) {
             json_die("502", 'Unable to signup now. Please try again later.');
         }
@@ -57,19 +57,84 @@ class user {
 
     /**
      * 
-     * @param type $username
-     * @return type
+     * @param String $userName
+     * @return booolean
      */
-    public static function userExists($username) {
-        $username = _escape($username);
-        $userData = q("select id from user where username = '{$username}'  ");
+    public static function userExists($userName) {
+        $userName = _escape($userName);
+        $userData = q("select id from user where username = '{$userName}'  ");
         return count($userData) > 0 ? true : false;
     }
 
-    public static function login($username,$password){
-        $username = _escape($username);
-        $password = _escape($password);
-        
-        $query = "";
+    /**
+     * 
+     * Login routine
+     * 
+     * 
+     * @param string $userName
+     * @param string $password
+     */
+    public static function login($userName, $password) {
+        $userName = _escape($userName);
+        $password = (_escape($password));
+
+
+        # validation for blank username
+        if (trim($userName) == '') {
+            json_die('502', 'Username cannot be blank');
+        }
+        # validation for blank password
+        if (trim($password) == '') {
+            json_die('502', 'Password cannot be blank');
+        }
+
+        $password = md5($password);
+        $query = "select id from user where username = '{$userName}' AND password = '{$password}' LIMIT 0,1 ";
+
+        try {
+            $data = qs($query);
+        } catch (Exception $exc) {
+            json_die("502", 'Unable to login now. Please try again later.');
+        }
+
+        if (!empty($data)) {
+            # get user id
+            $userId = $data['id'];
+
+            # stop existing session
+            user::stopSession();
+            # create new session
+            $sessionId = user::startSession();
+
+            # send the response
+            json_die("200", 'Login Successful', array('sessionId' => $sessionId, 'userId' => $userId));
+        } else {
+            json_die("502", 'Sorry, Invalid username or password.');
+        }
     }
+
+    /**
+     * Destroy the session data
+     * unset session cookie vars
+     */
+    public static function stopSession() {
+        $_SESSION = array();
+
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]
+            );
+        }
+        session_destroy();
+    }
+
+    /**
+     * Create a new session
+     * @return string
+     */
+    public static function startSession() {
+        session_start();
+        return session_id();
+    }
+
 }
