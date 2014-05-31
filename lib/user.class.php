@@ -29,6 +29,7 @@ class user {
         $data['city'] = _escape($_REQUEST['city']);
         $data['state'] = _escape($_REQUEST['state']);
         $data['zipcode'] = _escape($_REQUEST['zipcode']);
+        $data['phone_no'] = _escape($_REQUEST['phone_no']);
 
         # validation for blank username
         if (trim($data['username']) == '') {
