@@ -104,7 +104,7 @@ class user {
         }
 
         $password = md5($password);
-        $query = "select id from user where username = '{$userName}' AND password = '{$password}' LIMIT 0,1 ";
+        $query = "select id from user where (username = '{$userName}' OR email = '{$userName}') AND password = '{$password}' LIMIT 0,1 ";
 
         try {
             $data = qs($query);

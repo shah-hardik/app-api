@@ -9,13 +9,17 @@
  * @since May 2014
  * 
  */
-
 switch ($endPoint) {
     case "signup":
         user::signup();
         break;
     case "login":
-        user::login($_REQUEST['username'],$_REQUEST['password']);
+        if (isset($_REQUEST['username']) && $_REQUEST['username'] != '') {
+            $user_name = trim($_REQUEST['username']);
+        } else {
+            $user_name = trim($_REQUEST['email']);
+        }
+        user::login($user_name, $_REQUEST['password']);
         break;
     case "profilePicture":
         user::profilePicture();
