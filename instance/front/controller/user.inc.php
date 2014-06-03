@@ -19,10 +19,23 @@ switch ($endPoint) {
         } else {
             $user_name = trim($_REQUEST['email']);
         }
-        user::login($user_name, $_REQUEST['password']);
+        if (isset($_REQUEST['password']) && trim($_REQUEST['password']) != '') {
+            user::login($user_name, $_REQUEST['password']);
+        } elseif (isset($_REQUEST['facebookToken']) && trim($_REQUEST['facebookToken']) != '') {
+            user::facebookTokenlogin($user_name, trim($_REQUEST['facebookToken']));
+        } else {
+            if ($user_name == '') {
+                json_die('502', 'Username or Email is required');
+            } else {
+                json_die('502', 'Password or facebookToken is required');
+            }
+        }
+
         break;
     case "profilePicture":
-        user::profilePicture();
+        $userId = trim($_REQUEST['userId']);
+        $photo_stream = trim($_REQUEST['photo_stream']);
+        user::profilePicture($userId, $photo_stream);
         break;
     default:
         json_die('404', 'Page Not Found');

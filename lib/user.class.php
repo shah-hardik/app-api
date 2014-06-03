@@ -129,6 +129,53 @@ class user {
     }
 
     /**
+     * 
+     * Facebook Token Login
+     * 
+     * 
+     * @param string $email
+     * @param string $facebookToken
+     */
+    public static function facebookTokenlogin($email, $facebookToken) {
+        $email = _escape($email);
+        $facebookToken = _escape($facebookToken);
+
+
+        # validation for blank username
+        if (trim($email) == '') {
+            json_die('502', 'Email cannot be blank');
+        }
+        # validation for blank password
+        if (trim($facebookToken) == '') {
+            json_die('502', 'Facebook Token cannot be blank');
+        }
+
+        $facebookToken = trim($facebookToken);
+        $query = "select id from user where email = '{$email}' AND facebook_token = '{$facebookToken}' LIMIT 0,1 ";
+
+        try {
+            $data = qs($query);
+        } catch (Exception $exc) {
+            json_die("502", 'Unable to login now. Please try again later.');
+        }
+
+        if (!empty($data)) {
+            # get user id
+            $userId = $data['id'];
+
+            # stop existing session
+            user::stopSession();
+            # create new session
+            $sessionId = user::startSession();
+
+            # send the response
+            json_die("200", 'Login Successful', array('sessionId' => $sessionId, 'userId' => $userId));
+        } else {
+            json_die("502", 'Sorry, Invalid email or facebookToken.');
+        }
+    }
+
+    /**
      * Destroy the session data
      * unset session cookie vars
      */
@@ -150,6 +197,42 @@ class user {
     public static function startSession() {
         session_start();
         return session_id();
+    }
+
+    /**
+     * 
+     * User Profile Picture
+     * 
+     * 
+     * @param string $userId
+     * @param string $photo_stream
+     */
+    public static function profilePicture($userId, $photo_stream) {
+        # validation for blank userId
+        if (trim($userId) == '') {
+            json_die('502', 'userId cannot be blank');
+        }
+        # validation for blank photo_stream
+        if (trim($photo_stream) == '') {
+            json_die('502', 'Photo stream cannot be blank');
+        }
+        $base = trim($photo_stream);
+
+        $binary = base64_decode($base);
+        header('Content-Type: bitmap; charset=utf-8');
+        $chars = rand(0000, 9999) . "_" . time();
+
+        $picture = _PATH . "user_img/" . $chars . ".jpg";
+        $picture_img = $chars . ".jpg";
+        if ($picture != '') {
+            $file = fopen($picture, 'wb');
+            fwrite($file, $binary);
+            fclose($file);
+            $data['user_id'] = $userId;
+            $data['picture'] = $picture_img;
+            $userId = qi('user_profile_picture', $data);
+            json_die("200", "User profile picture updated successfully");
+        }
     }
 
 }

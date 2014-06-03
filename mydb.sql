@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 31, 2014 at 01:00 PM
+-- Generation Time: Jun 03, 2014 at 02:33 PM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -19,6 +19,28 @@ SET time_zone = "+00:00";
 --
 -- Database: `mydb`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_users`
+--
+
+CREATE TABLE IF NOT EXISTS `admin_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `modified_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='List of admin users' AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `admin_users`
+--
+
+INSERT INTO `admin_users` (`id`, `user_name`, `password`, `created_at`, `modified_at`) VALUES
+(1, 'admin@admin.com', 'e10adc3949ba59abbe56e057f20f883e', '2013-10-23 00:00:00', '2013-10-24 14:05:12');
 
 -- --------------------------------------------------------
 
@@ -305,6 +327,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` varchar(45) NOT NULL,
   `username` varchar(45) NOT NULL,
   `password` varchar(45) NOT NULL,
+  `facebook_token` text NOT NULL,
   `first_name` varchar(45) DEFAULT NULL,
   `last_name` varchar(45) DEFAULT NULL,
   `address` text NOT NULL,
@@ -321,11 +344,11 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `email`, `username`, `password`, `first_name`, `last_name`, `address`, `city`, `state`, `zipcode`, `phone_no`, `created_at`, `modified_at`) VALUES
-(9, 'test@test.com', 'test', 'e10adc3949ba59abbe56e057f20f883e', 'Test', 'Test', '', '', '', '', NULL, '2014-05-28 07:59:27', '2014-05-28 07:59:27'),
-(13, 'test1@test.com', 'test11', 'e10adc3949ba59abbe56e057f20f883e', 'Test11', 'Test12', 'Test Address', 'Test City', 'Test State', '12345', '223344', '2014-05-29 09:07:51', '2014-05-29 09:07:51'),
-(14, 'test2@test.com', 'test22', 'e10adc3949ba59abbe56e057f20f883e', 'Test21', 'Test22', 'Test Address', 'Lost Angeles', 'USA', '12345', '334455', '2014-05-29 09:07:57', '2014-05-29 09:07:57'),
-(15, 'test3@test.com', 'test33', 'e10adc3949ba59abbe56e057f20f883e', 'Test3', 'Test3', 'Test Address', 'Test City', 'Test State', '12345', '112233', '2014-05-31 09:18:22', '2014-05-31 09:18:22');
+INSERT INTO `user` (`id`, `email`, `username`, `password`, `facebook_token`, `first_name`, `last_name`, `address`, `city`, `state`, `zipcode`, `phone_no`, `created_at`, `modified_at`) VALUES
+(9, 'test@test.com', 'test', 'e10adc3949ba59abbe56e057f20f883e', 'abcd1234', 'Test', 'Test', '', '', '', '', NULL, '2014-05-28 07:59:27', '2014-05-28 07:59:27'),
+(13, 'test1@test.com', 'test11', 'e10adc3949ba59abbe56e057f20f883e', 'efgh5678', 'Test11', 'Test12', 'Test Address', 'Test City', 'Test State', '12345', '223344', '2014-05-29 09:07:51', '2014-05-29 09:07:51'),
+(14, 'test2@test.com', 'test22', 'e10adc3949ba59abbe56e057f20f883e', 'ijklmn90', 'Test21', 'Test22', 'Test Address', 'Lost Angeles', 'USA', '12345', '334455', '2014-05-29 09:07:57', '2014-05-29 09:07:57'),
+(15, 'test3@test.com', 'test33', 'e10adc3949ba59abbe56e057f20f883e', 'opqrstu', 'Test3', 'Test3', 'Test Address', 'Test City', 'Test State', '12345', '112233', '2014-05-31 09:18:22', '2014-05-31 09:18:22');
 
 -- --------------------------------------------------------
 
@@ -420,6 +443,21 @@ CREATE TABLE IF NOT EXISTS `user_profile` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id_UNIQUE` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_profile_picture`
+--
+
+CREATE TABLE IF NOT EXISTS `user_profile_picture` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `picture` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `modified_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
 -- --------------------------------------------------------
 
