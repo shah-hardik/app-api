@@ -9,7 +9,7 @@
  */
 switch ($endPoint) {
     case "detail":
-        $userID = trim($_REQUEST['userID']);
+        $userID = trim($_REQUEST['userId']);
         profile::ProfileDetailWithPost($userID);
         break;
 

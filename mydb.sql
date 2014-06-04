@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 03, 2014 at 02:33 PM
+-- Generation Time: Jun 04, 2014 at 02:07 PM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -457,7 +457,14 @@ CREATE TABLE IF NOT EXISTS `user_profile_picture` (
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=16 ;
+
+--
+-- Dumping data for table `user_profile_picture`
+--
+
+INSERT INTO `user_profile_picture` (`id`, `user_id`, `picture`, `created_at`, `modified_at`) VALUES
+(9, 14, '1595_1401863892.jpg', '2014-06-04 07:58:47', '2014-06-04 08:38:12');
 
 -- --------------------------------------------------------
 

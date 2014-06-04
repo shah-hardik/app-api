@@ -19,6 +19,7 @@ class alert {
         }
 
         $query = "SELECT UA.*,
+                         U.id as UserID, 
                          U.email,
                          U.username,
                          U.first_name,
@@ -35,7 +36,7 @@ class alert {
             } else {
                 $i = 0;
                 foreach ($res as $each_res) {
-                    $stream[$i]['picture'] = 'Not Available';
+                    $stream[$i]['picture'] = User::GetProfilePicture($each_res['UserID']);
                     $stream[$i]['username'] = $each_res['username'];
                     $stream[$i]['alert'] = $each_res['alert'];
                     $stream[$i]['timestamp'] = $each_res['created_at'];

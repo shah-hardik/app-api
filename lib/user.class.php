@@ -230,9 +230,27 @@ class user {
             fclose($file);
             $data['user_id'] = $userId;
             $data['picture'] = $picture_img;
-            $userId = qi('user_profile_picture', $data);
-            json_die("200", "User profile picture updated successfully");
+            $res = qs("SELECT id from user_profile_picture WHERE user_id = " . $userId);
+            if (empty($res)) {
+                $photo_id = qi('user_profile_picture', $data);
+                json_die("200", "Profile picture saved successfully", array('photo_id' => $photo_id));
+            } else {
+                $photo_id = $res['id'];
+                $data_update['picture'] = $picture_img;
+                $res1 = qu('user_profile_picture', $data_update, " user_id = " . $userId);
+                json_die("200", "Profile picture saved successfully", array('photo_id' => $photo_id));
+            }
         }
+    }
+
+    public static function GetProfilePicture($userId) {
+        $res = qs("SELECT * FROM user_profile_picture WHERE user_id = " . $userId);
+        if (!empty($res)) {
+            $img_path = _U . 'user_img/' . $res['picture'];
+        } else {
+            $img_path = 'Not Available';
+        }
+        return $img_path;
     }
 
 }

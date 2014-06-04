@@ -195,7 +195,8 @@ class nei {
                                 U.username,
                                 U.email,
                                 U.first_name,
-                                U.last_name 
+                                U.last_name,
+                                U.id as UserID  
                            FROM neighborhood_invite NI,
                                 user U
                           WHERE NI.user_id_to = '" . $user_id_to . "' 
@@ -207,7 +208,7 @@ class nei {
             $total_nel = count($res);
             $i = 0;
             foreach ($res as $each_res) {
-                $inviteList[$i]['picture'] = 'Not Available';
+                $inviteList[$i]['picture'] = User::GetProfilePicture($each_res['UserID']);
                 $inviteList[$i]['inviteFrom'] = $each_res['first_name'] . " " . $each_res['last_name'];
                 $i++;
             }
