@@ -11,7 +11,8 @@
  */
 switch ($endPoint) {
     case "list":
-        nei::doList();
+        $userId = trim($_REQUEST['userId']);
+        nei::doList($userId);
         break;
     case "create":
         nei::add();
