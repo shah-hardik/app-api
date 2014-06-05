@@ -121,8 +121,9 @@ class nei {
             $neiId = qi('neighborhood', $data);
 
             $data_user['neighborhood_id'] = $neiId;
-            $neiId = qi('neighborhood_has_user', $data_user);
-
+            q('SET FOREIGN_KEY_CHECKS=0');
+            $neiId_has = qi('neighborhood_has_user', $data_user);
+            q('SET FOREIGN_KEY_CHECKS=1');
             json_die("200", "Neighborhood created successfully", array('neiId' => $neiId));
         } catch (Exception $e) {
             json_die("502", 'Unable to create neighborhood.');
