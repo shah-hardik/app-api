@@ -12,7 +12,12 @@
 switch ($endPoint) {
     case "list":
         $userId = trim($_REQUEST['userId']);
-        nei::doList($userId);
+        if ($userId == '') {
+            $userId = trim($_REQUEST['userID']);
+        }
+        $latitude = trim(_escape($_REQUEST['latitude']));
+        $longitude = trim(_escape($_REQUEST['longitude']));
+        nei::doList($userId, $latitude, $longitude);
         break;
     case "create":
         nei::add();

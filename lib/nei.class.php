@@ -27,45 +27,73 @@ class nei {
      * SELECT ((ACOS(SIN($lat * PI() / 180) * SIN(lat * PI() / 180) + COS($lat * PI() / 180) * COS(lat * PI() / 180) * COS(($lon – lon) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS `distance` FROM `members` HAVING `distance`<=’10′ ORDER BY `distance` ASC
      * 
      */
-    public static function doList($userID) {
-        //$query = "SELECT ((ACOS(SIN({$lat} * PI() / 180) * SIN(location_latitude * PI() / 180) + COS({$lat} * PI() / 180) * COS(location_latitude * PI() / 180) * COS(({$lon} – location_longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS distance FROM  neighborhood HAVING distance<=10 ORDER BY distance ASC";
-        # validation for blank userID
-        if (trim($userID) == '') {
-            json_die('502', 'userID is required');
+    public static function doList($userID, $lat, $lon) {
+        $user_wherecon = '';
+        if ($userID > 0 && $userID != '') {
+            $user_wherecon = " AND U.id = " . $userID;
         }
-        $query = "SELECT N.id as neiId,
-                         N.name as neiName,
-                         N.users_count,
-                         U.email,
-                         U.username,
-                         U.first_name,
-                         U.last_name,
-                         U.address,
-                         U.city,
-                         U.state,
-                         U.zipcode,
-                         U.phone_no
-                    FROM neighborhood N,
-                         neighborhood_has_user NHU,
-                         User U
-                   WHERE N.id = NHU.neighborhood_id 
-                     AND NHU.user_id = U.id 
-                     AND U.id = " . $userID;
-        $res = q($query);
-        if (empty($res)) {
-            json_die("404", 'No neighborhoods found!');
+        if ($lat != '' && $lon != '') {
+
+            $lat_lon_calculation = "((ACOS(SIN({$lat} * PI() / 180) * SIN(N.location_latitude * PI() / 180) + COS({$lat} * PI() / 180) * COS(N.location_latitude * PI() / 180) * COS(({$lon} - N.location_longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515)";
+            $query = "SELECT 
+                             N.name as neiName,
+                              N.users_count,
+                              U.email,
+                              U.username,
+                              U.first_name,
+                              U.last_name,
+                              U.address,
+                              U.city,
+                              U.state,
+                              U.zipcode,
+                              U.phone_no,
+                              " . $lat_lon_calculation . " AS distance 
+                              FROM neighborhood N,
+                              neighborhood_has_user NHU,
+                              user U
+                              WHERE N.id = NHU.neighborhood_id 
+                              AND " . $lat_lon_calculation . " <= 10 
+                              AND NHU.user_id = U.id " . $user_wherecon;
         } else {
-            $total_naiId = count($res);
-            $i = 0;
-            foreach ($res as $each_res) {
-                $dataList[$i]['neiId'] = $each_res['neiId'];
-                $dataList[$i]['neiName'] = $each_res['neiName'];
-                $dataList[$i]['city'] = $each_res['city'];
-                $dataList[$i]['country'] = $each_res['state'];
-                $dataList[$i]['count'] = ($each_res['users_count'] > 0) ? $each_res['users_count'] : '0';
-                $i++;
+            $query = "SELECT N.id as neiId,
+                              N.name as neiName,
+                              N.users_count,
+                              U.email,
+                              U.username,
+                              U.first_name,
+                              U.last_name,
+                              U.address,
+                              U.city,
+                              U.state,
+                              U.zipcode,
+                              U.phone_no
+                              FROM neighborhood N,
+                              neighborhood_has_user NHU,
+                              user U
+                              WHERE N.id = NHU.neighborhood_id
+                              AND NHU.user_id = U.id " . $user_wherecon;
+        }
+        try {
+            $res = q($query);
+            if (empty($res)) {
+                json_die("404", 'No neighborhoods found!');
+            } else {
+                $total_naiId = count($res);
+                $i = 0;
+                foreach ($res as $each_res) {
+                    $dataList[$i]['neiId'] = $each_res['neiId'];
+                    $dataList[$i]['neiName'] = $each_res['neiName'];
+                    $dataList[$i]['city'] = $each_res['city'];
+                    $dataList[$i]['country'] = $each_res['state'];
+                    $dataList[$i]['count'] = ($each_res['users_count'] > 0) ? $each_res['users_count'] : '0';
+                    $i++;
+                }
+                json_die("200", "", array('count' => $total_naiId, 'dataList' => $dataList));
             }
-            json_die("200", "", array('count' => $total_naiId, 'dataList' => $dataList));
+        } catch (Exception $e) {
+            d($e);
+            die;
+            json_die("502", 'Unable retrive');
         }
     }
 
