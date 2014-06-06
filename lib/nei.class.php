@@ -29,15 +29,41 @@ class nei {
      */
     public static function doList($userID, $lat, $lon) {
         $user_wherecon = '';
+        $res = nei::getPlaceName($lat, $lon);
         if ($userID > 0 && $userID != '') {
             $user_wherecon = " AND U.id = " . $userID;
         }
-        if ($lat != '' && $lon != '') {
 
-            $lat_lon_calculation = "((ACOS(SIN({$lat} * PI() / 180) * SIN(N.location_latitude * PI() / 180) + COS({$lat} * PI() / 180) * COS(N.location_latitude * PI() / 180) * COS(({$lon} - N.location_longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515)";
-            $query = "SELECT 
-                             N.name as neiName,
+        if ($lat != '' && $lon != '' & !empty($res)) {
+            /*
+              $lat_lon_calculation = "((ACOS(SIN({$lat} * PI() / 180) * SIN(N.location_latitude * PI() / 180) + COS({$lat} * PI() / 180) * COS(N.location_latitude * PI() / 180) * COS(({$lon} - N.location_longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515)";
+              $query = "SELECT
+              N.name as neiName,
+              N.users_count,
+              U.email,
+              U.username,
+              U.first_name,
+              U.last_name,
+              U.address,
+              U.city,
+              U.state,
+              U.zipcode,
+              U.phone_no,
+              " . $lat_lon_calculation . " AS distance
+              FROM neighborhood N,
+              neighborhood_has_user NHU,
+              user U
+              WHERE N.id = NHU.neighborhood_id
+              AND " . $lat_lon_calculation . " <= 10
+              AND NHU.user_id = U.id " . $user_wherecon;
+
+             */
+
+            $query = "SELECT N.id as neiId,
+                              N.name as neiName,
                               N.users_count,
+                              N.nei_city,
+                              N.nei_state,
                               U.email,
                               U.username,
                               U.first_name,
@@ -46,18 +72,20 @@ class nei {
                               U.city,
                               U.state,
                               U.zipcode,
-                              U.phone_no,
-                              " . $lat_lon_calculation . " AS distance 
-                              FROM neighborhood N,
+                              U.phone_no
+                         FROM neighborhood N,
                               neighborhood_has_user NHU,
                               user U
-                              WHERE N.id = NHU.neighborhood_id 
-                              AND " . $lat_lon_calculation . " <= 10 
-                              AND NHU.user_id = U.id " . $user_wherecon;
+                        WHERE N.id = NHU.neighborhood_id 
+                          AND N.nei_city LIKE '%" . $res['city'] . "%' 
+                          AND N.nei_state LIKE '%" . $res['state'] . "%' 
+                          AND NHU.user_id = U.id " . $user_wherecon;
         } else {
             $query = "SELECT N.id as neiId,
                               N.name as neiName,
                               N.users_count,
+                              N.nei_city,
+                              N.nei_state,
                               U.email,
                               U.username,
                               U.first_name,
@@ -83,8 +111,8 @@ class nei {
                 foreach ($res as $each_res) {
                     $dataList[$i]['neiId'] = $each_res['neiId'];
                     $dataList[$i]['neiName'] = $each_res['neiName'];
-                    $dataList[$i]['city'] = $each_res['city'];
-                    $dataList[$i]['country'] = $each_res['state'];
+                    $dataList[$i]['city'] = $each_res['nei_city'];
+                    $dataList[$i]['country'] = $each_res['nei_state'];
                     $dataList[$i]['count'] = ($each_res['users_count'] > 0) ? $each_res['users_count'] : '0';
                     $i++;
                 }
@@ -111,6 +139,19 @@ class nei {
         $data['is_public'] = _escape($_REQUEST['visibility']);
         $data['is_join_restricted'] = _escape($_REQUEST['allowOthers']);
         $data_user['user_id'] = _escape($_REQUEST['userID']);
+
+        $location_arr = explode(',', _escape($_REQUEST['location']));
+        if (!empty($location_arr)) {
+            if ($location_arr[0] != '') {
+                $nei_city = trim($location_arr[0]);
+                $data['nei_city'] = $nei_city;
+            }
+            if ($location_arr[1] != '') {
+                $nei_state = trim($location_arr[1]);
+                $data['nei_state'] = $nei_state;
+            }
+        }
+
 
         # validation for blank neighborhood name
         if (trim($data['name']) == '') {
@@ -329,6 +370,57 @@ class nei {
             die;
             json_die("502", 'Unable to delete neighborhood');
         }
+    }
+
+    public static function getPlaceName($latitude, $longitude) {
+        //This below statement is used to send the data to google maps api and get the place
+        $geocode = file_get_contents('http://maps.googleapis.com/maps/api/geocode/json?latlng=' . $latitude . ',' . $longitude . '&sensor=true');
+        //$geocode = file_get_contents('http://geocoder.ca/?latt=' . $latitude . '&longt=' . $longitude . '&reverse=1&allna=1&geoit=xml&corner=1&jsonp=1&callback=test');
+        $result = json_decode($geocode, true);
+        $result = $result['results'];
+        $location = array();
+        $short_location = array();
+        foreach ($result as $component_1) {
+            foreach ($component_1['address_components'] as $component) {
+                switch ($component['types']) {
+                    case in_array('street_number', $component['types']):
+                        $location['street_number'] = $component['long_name'];
+                        $short_location['street_number'] = $component['short_name'];
+                        break;
+                    case in_array('route', $component['types']):
+                        $location['street'] = $component['long_name'];
+                        $short_location['street'] = $component['short_name'];
+                        break;
+                    case in_array('sublocality', $component['types']):
+                        $location['sublocality'] = $component['long_name'];
+                        $short_location['sublocality'] = $component['short_name'];
+                        break;
+                    case in_array('locality', $component['types']):
+                        $location['locality'] = $component['long_name'];
+                        $short_location['locality'] = $component['short_name'];
+                        break;
+                    case in_array('administrative_area_level_2', $component['types']):
+                        $location['admin_2'] = $component['long_name'];
+                        $short_location['admin_2'] = $component['short_name'];
+                        break;
+                    case in_array('administrative_area_level_1', $component['types']):
+                        $location['admin_1'] = $component['long_name'];
+                        $short_location['admin_1'] = $component['short_name'];
+                        break;
+                    case in_array('postal_code', $component['types']):
+                        $location['postal_code'] = $component['long_name'];
+                        $short_location['postal_code'] = $component['short_name'];
+                        break;
+                    case in_array('country', $component['types']):
+                        $location['country'] = $component['long_name'];
+                        $short_location['country'] = $component['short_name'];
+                        break;
+                }
+            }
+        }
+        $add['city'] = $short_location['locality'];
+        $add['state'] = $short_location['country'];
+        return $add;
     }
 
 }
