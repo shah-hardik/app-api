@@ -263,7 +263,8 @@ class nei {
                                 U.email,
                                 U.first_name,
                                 U.last_name,
-                                U.id as UserID  
+                                U.id as UserID,
+                                invite_status
                            FROM neighborhood_invite NI,
                                 user U
                           WHERE NI.user_id_to = '" . $user_id_to . "' 
@@ -275,8 +276,16 @@ class nei {
             $total_nel = count($res);
             $i = 0;
             foreach ($res as $each_res) {
-                $inviteList[$i]['picture'] = User::GetProfilePicture($each_res['UserID']);
+                $inviteList[$i]['picture'] = user::GetProfilePicture($each_res['UserID']);
                 $inviteList[$i]['inviteFrom'] = $each_res['first_name'] . " " . $each_res['last_name'];
+                if ($each_res['invite_status'] == '0') {
+                    $invite_status = 'Pending';
+                } elseif ($each_res['invite_status'] == '1') {
+                    $invite_status = 'Accept';
+                } elseif ($each_res['invite_status'] == '2') {
+                    $invite_status = 'Decline';
+                }
+                $inviteList[$i]['inviteStatus'] = $invite_status;
                 $i++;
             }
             json_die("200", "", array('count' => $total_nel, 'inviteList' => $inviteList));

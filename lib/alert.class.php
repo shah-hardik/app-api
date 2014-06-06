@@ -36,7 +36,7 @@ class alert {
             } else {
                 $i = 0;
                 foreach ($res as $each_res) {
-                    $stream[$i]['picture'] = User::GetProfilePicture($each_res['UserID']);
+                    $stream[$i]['picture'] = user::GetProfilePicture($each_res['UserID']);
                     $stream[$i]['username'] = $each_res['username'];
                     $stream[$i]['alert'] = $each_res['alert'];
                     $stream[$i]['timestamp'] = $each_res['created_at'];

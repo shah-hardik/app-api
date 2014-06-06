@@ -23,7 +23,7 @@ class feeds {
                          U.state,
                          U.zipcode 
                     FROM post P,
-                         User U 
+                         user U 
                    WHERE (U.username LIKE '%" . $search . "%' OR 
                           U.first_name LIKE '%" . $search . "%' OR 
                           U.last_name LIKE '%" . $search . "%' OR 
@@ -71,7 +71,7 @@ class feeds {
                          U.state,
                          U.zipcode 
                     FROM post P,
-                         User U,
+                         user U,
                          neighborhood N,
                          neighborhood_has_user NHU 
                    WHERE N.name LIKE '%" . $search . "%' 

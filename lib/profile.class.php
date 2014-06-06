@@ -55,7 +55,7 @@ class profile {
         $detail_arg = array('list' => '',
             'neighbors' => $neighbors_count,
             'neighborhoods' => $neighborhoods_count,
-            'picture' => User::GetProfilePicture($userID),
+            'picture' => user::GetProfilePicture($userID),
             'title' => $user_detail_arr['first_name'] . " " . $user_detail_arr['last_name'],
             'location' => $user_detail_arr['address'] . " " . $user_detail_arr['city'] . " " . $user_detail_arr['state'] . " " . $user_detail_arr['zipcode'],
             'description' => 'Not Available',
