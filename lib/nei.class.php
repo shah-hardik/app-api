@@ -30,6 +30,7 @@ class nei {
     public static function doList($userID, $lat, $lon) {
         $user_wherecon = '';
         $res = nei::getPlaceName($lat, $lon);
+		//d(utf8_decode($res['city']));
         if ($userID > 0 && $userID != '') {
             $user_wherecon = " AND U.id = " . $userID;
         }
@@ -59,7 +60,7 @@ class nei {
 
              */
 
-            $query = "SELECT N.id as neiId,
+             $query = "SELECT N.id as neiId,
                               N.name as neiName,
                               N.users_count,
                               N.nei_city,
@@ -77,8 +78,8 @@ class nei {
                               neighborhood_has_user NHU,
                               user U
                         WHERE N.id = NHU.neighborhood_id 
-                          AND N.nei_city LIKE '%" . $res['city'] . "%' 
-                          AND N.nei_state LIKE '%" . $res['state'] . "%' 
+                          AND ( N.nei_city LIKE '%" . utf8_decode($res['city']) . "%' 
+                          OR N.nei_state LIKE '%" . $res['state'] . "%' )
                           AND NHU.user_id = U.id " . $user_wherecon;
         } else {
             $query = "SELECT N.id as neiId,
@@ -406,6 +407,7 @@ class nei {
                     case in_array('administrative_area_level_1', $component['types']):
                         $location['admin_1'] = $component['long_name'];
                         $short_location['admin_1'] = $component['short_name'];
+						$location['formatted_address'] = $component_1['formatted_address'];
                         break;
                     case in_array('postal_code', $component['types']):
                         $location['postal_code'] = $component['long_name'];
@@ -418,8 +420,11 @@ class nei {
                 }
             }
         }
-        $add['city'] = $short_location['locality'];
-        $add['state'] = $short_location['country'];
+		
+			$add['city'] = $short_location['locality'];
+			$add['state'] = $location['admin_1'];
+		
+		
         return $add;
     }
 
