@@ -6,7 +6,7 @@
  * 
  * @author Hardik Shah <hardiks059@gmail.com>
  * @version 1.0
- * @package Neighboring
+ * @package app-api-admin
  * 
  */
 
@@ -17,7 +17,7 @@
  * 
  * @author Hardik Shah <hardiks059@gmail.com>
  * @version 1.0
- * @package Neighboring
+ * @package app-api-admin
  * 
  */
 function _set($var) {
@@ -33,11 +33,11 @@ function _set($var) {
  * 
  * @author Hardik Shah <hardiks059@gmail.com>
  * @version 1.0
- * @package Neighboring
+ * @package app-api-admin
  * 
  */
 function _e(&$s, $a = null) {
-    return !empty($s) ? $s : $a;
+    return!empty($s) ? $s : $a;
 }
 
 /**
@@ -47,7 +47,7 @@ function _e(&$s, $a = null) {
  * @return String escaped string
  * @author Hardik Shah <hardiks059@gmail.com>
  * @version 1.0
- * @package Neighboring
+ * @package app-api-admin
  */
 function _escape($string) {
     $string = stripslashes($string);
@@ -59,7 +59,7 @@ function _escape($string) {
  * 
  * @author Hardik Shah <hardiks059@gmail.com>
  * @version 1.0
- * @package Neighboring
+ * @package app-api-admin
  */
 function qi($table, $fields, $operation = 'INSERT') {
     $db = Db::__d();
@@ -86,7 +86,7 @@ function qs($query) {
  * 
  * @author Hardik Shah <hardiks059@gmail.com>
  * @version 1.0
- * @package Neighboring
+ * @package app-api-admin
  */
 function qu($table, $fields, $condition) {
     $db = Db::__d();
@@ -101,7 +101,7 @@ function qu($table, $fields, $condition) {
  * 
  * @author Hardik Shah <hardiks059@gmail.com>
  * @version 1.0
- * @package Neighboring
+ * @package app-api-admin
  */
 function _mysqlDate($timestamp = 0) {
     $timestamp = $timestamp ? $timestamp : time();
@@ -111,12 +111,16 @@ function _mysqlDate($timestamp = 0) {
 function _getInstance($url) {
     $arg = explode("/", $url);
     switch ($arg[0]) {
-
+        case 'admin':
+            _cg('url', _e($arg[1], "home"));
+            _cg("url_instance", $arg[0]);
+            _cg("instance", "admin");
+            break;
         default:
             if ($arg[0] != '') {
                 $url_d = $arg[0];
             } else {
-                $url_d = '404';
+                $url_d = 'home';
             }
             _cg('url', $url_d);
             _cg("url_instance", '');
@@ -207,7 +211,16 @@ function _level_auth_url($pages, $return_page) {
         _cg("url", $return_page);
     }
 }
+function _cprint($key, $value, $print, $doPrint = true) {
 
+    if ($key == $value) {
+        if ($doPrint) {
+            print $print;
+        } else {
+            return $print;
+        }
+    }
+}
 function back_trace() {
     $array = debug_backtrace();
     $output = 'Execution Backtrace:<br><ul>';
@@ -239,12 +252,10 @@ function _normalDate($date) {
     return date("d-M-Y H:i a", strtotime($date));
 }
 
-function json_die($status = true, $message = '', $array = array()) {
+function json_die($status = true, $array = array()) {
     $response = array();
     $response['status'] = $status;
     $response['data'] = $array;
-    $response['message'] = $message;
-    header('Content-type: application/json');
     die(json_encode($response));
 }
 
@@ -258,12 +269,8 @@ function _errors_off() {
     error_reporting(0);
 }
 
-function formatDate($string) {
-    return date("Y-m-d H:i:s", strtotime($string));
+function clearNumber($number) {
+    return str_replace(array("-", "(", ")", " "), array("", "", "", ""), $number);
 }
 
-function _l($string) {
-    print "<div style='padding:8px;background-color:#FFFFCC;font-family:verdana;border:1px solid #DADADA;border-radius:5px;margin:4px;font-size:12px;font-weight:bold'>";
-    print $string;
-    print "</div>";
-}
+?>

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Loader file.
  * Includes libraries
@@ -8,7 +7,7 @@
  * 
  * @author Hardik Shah <hardiks059@gmail.com>
  * @version 1.0
- * @package Neighboring
+ * @package app-api-admin
  * 
  */
 define("_PATH", str_replace("loader.php", "", __FILE__));
@@ -18,7 +17,7 @@ function __autoload($class_name) {
 }
 
 include "lib/utils.php"; # includes general function
-
+//include "lib/utils_checklist.php";
 _getInstance($_REQUEST['q']);
 $instance = _cg("instance");
 
@@ -37,14 +36,10 @@ $db = Db::__d();
 include _PATH . "instance/{$instance}/config.inc.php";
 
 $url = _cg("url"); // set from _getInstance function
-define('_URL', $url);
+define(_URL, $url);
 
 $modulePage = $url . ".php";
-$tpl = "index.tpl.php";
+@include _PATH . "instance/{$instance}/controller/{$url}.inc.php";
 
-
-if (!@include _PATH . "instance/{$instance}/controller/{$url}.inc.php") {
-    include _PATH . "instance/{$instance}/controller/404.inc.php";
-}
-//include _PATH . "instance/{$instance}/tpl/{$tpl}";
+include _PATH . "instance/{$instance}/tpl/index.tpl.php";
 ?>

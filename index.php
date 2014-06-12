@@ -8,7 +8,7 @@
  * 
  */
 session_start();
-error_reporting(E_ALL);
+error_reporting(0);
 
 
 # DB informaitons
@@ -17,7 +17,7 @@ define('DB_PASSWORD', '');
 define('DB_UNAME', 'root');
 define('DB_NAME', 'mydb');
 
-define('DEV_MODE', false);
+//define('DEV_MODE', false);
 
 include "loader.php";
 ?>
